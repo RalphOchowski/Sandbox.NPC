@@ -19,8 +19,8 @@ export const signup = async(req, res) => {
 
         //console.log("Request body:", req.body);
         //console.log("Email value:", email);
-		const [localPart, domain] = email.split('@');
-		const normalizedEmail = `${localPart}@${domain.toLowerCase()}`;
+        const [localPart, domain] = email.split('@');
+        const normalizedEmail = `${localPart}@${domain.toLowerCase()}`;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //take note
 
         if (!emailRegex.test(
@@ -30,7 +30,9 @@ export const signup = async(req, res) => {
             });
         }
         //console.log("Regex test:", emailRegex.test(email));
-        const user = await User.findOne({ email:normalizedEmail }); //take note
+        const user = await User.findOne({
+            email: normalizedEmail
+        }); //take note
         if (user)
             return res.status(400)
             .json({
@@ -45,8 +47,8 @@ export const signup = async(req, res) => {
             password: hashedPassword
         });
         if (newUser) {
-            generateToken(newUser._id, res);
             await newUser.save();
+            generateToken(newUser._id, res);
 
             res.status(201).json({
                 _id: newUser._id,
