@@ -3,7 +3,7 @@ import { MONGO_URI } from "./config.js";
 
 export const connectDB = async() => {
     try {
-        const connectionValue = await mongoose.connect(process.env.MONGO_URI, {
+        const connectionValue = await mongoose.connect(MONGO_URI, {
             dbName: "realtime_chat_application"
         }); //take note
         console.log("MongoDB connected successfully: ", connectionValue.connection.host);
