@@ -19,17 +19,18 @@ export const signup = async(req, res) => {
 
         //console.log("Request body:", req.body);
         //console.log("Email value:", email);
-
+		const [localPart, domain] = email.split('@');
+		const normalizedEmail = `${localPart}@${domain.toLowerCase()}`;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //take note
 
         if (!emailRegex.test(
-                email)) { //take note
+                normalizedEmail)) { //take note
             return res.status(400).json({
                 message: "Invalid email format."
             });
         }
         //console.log("Regex test:", emailRegex.test(email));
-        const user = await User.findOne({ email }); //take note
+        const user = await User.findOne({ email:normalizedEmail }); //take note
         if (user)
             return res.status(400)
             .json({
@@ -39,8 +40,8 @@ export const signup = async(req, res) => {
         const salt = await bcrypt.genSalt(10); //take note
         const hashedPassword = await bcrypt.hash(password, salt); //take note
         const newUser = new User({
-            fullName,
-            email,
+            fullName: fullName.trim().replace(/\s+/g, " "), //gets rid of excessive spaces between first and last names
+            email: normalizedEmail,
             password: hashedPassword
         });
         if (newUser) {
