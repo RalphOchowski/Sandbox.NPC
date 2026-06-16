@@ -21,16 +21,16 @@ export const signup = async(req, res) => {
 
         //console.log("Request body:", req.body);
         //console.log("Email value:", email);
-        const [localPart, domain] = email.split('@');
-        const normalizedEmail = `${localPart}@${domain.toLowerCase()}`;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //take note
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //take note
         if (!emailRegex.test(
-                normalizedEmail)) { //take note
+                email)) { //take note
             return res.status(400).json({
                 message: "Invalid email format."
             });
         }
+        const [localPart, domain] = email.split('@');
+        const normalizedEmail = `${localPart}@${domain.toLowerCase()}`;
         //console.log("Regex test:", emailRegex.test(email));
         const user = await User.findOne({
             email: normalizedEmail
@@ -88,29 +88,37 @@ export const login = async(req, res) => {
             email
         });
         if (!user)
-            return res.status(400).json({message: "Invalid Credentials"});
-		
-		const isPasswordCorrect = await bcrypt.compare(password, user.password);
-		if (!isPasswordCorrect)
-            return res.status(400).json({message: "Invalid Credentials"});
-		
-		generateToken(user._id, res);
-		res.status(200).json({
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-                profilePic: user.profilePic
+            return res.status(400).json({
+                message: "Invalid Credentials"
             });
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect)
+            return res.status(400).json({
+                message: "Invalid Credentials"
+            });
+
+        generateToken(user._id, res);
+        res.status(200).json({
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            profilePic: user.profilePic
+        });
     } catch (error) {
-		console.log("Error in controller: ", error);
+        console.log("Error in controller: ", error);
         res.status(500)
         .json({
             message: "Internal Server Error."
         });
-	}
+    }
 };
 
 export const logout = async(_, res) => { //not using a request
-	res.cookie("jwt", "", { maxAge: 0 }); //erasing cookies by setting maximum age of jwt token generated for user to 0
-	res.status(200).json({message: "Logged Out Successfully"});
+    res.cookie("jwt", "", {
+        maxAge: 0
+    }); //erasing cookies by setting maximum age of jwt token generated for user to 0
+    res.status(200).json({
+        message: "Logged Out Successfully"
+    });
 };
