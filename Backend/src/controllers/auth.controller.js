@@ -6,6 +6,11 @@ import { CLIENT_URL } from "../lib/config.js";
 
 export const signup = async(req, res) => {
     const { fullName, email, password } = req.body; //take note
+    if (!email || !password) {
+        return res.status(400).json({
+            message: "Email and passowrd are required."
+        });
+    }
 
     try {
         if (!fullName || !email || !password) {
