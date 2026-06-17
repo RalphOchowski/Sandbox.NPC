@@ -3,12 +3,14 @@ import bcrypt from "bcryptjs"; //take note
 import { generateToken } from "../lib/utils.js";
 import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 import { CLIENT_URL } from "../lib/config.js";
+import cloudinary from "../lib/cloudinary.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 export const signup = async(req, res) => {
     const { fullName, email, password } = req.body; //take note
     if (!email || !password) {
         return res.status(400).json({
-            message: "Email and passowrd are required."
+            message: "Email and passoword are required."
         });
     }
 
@@ -126,4 +128,28 @@ export const logout = async(_, res) => { //not using a request
     res.status(200).json({
         message: "Logged Out Successfully"
     });
+};
+
+export const updateProfile = async(req, res) => {
+    try {
+        const { profilePic } = req.body;
+        if (!profilePic)
+            return res.status(400).json({
+                message: "Profile pic required."
+            });
+        const userId = req.user._id; //take note, apparently not assigning the user the object from the request body makes this undefined, why do we do this?
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        const updatedUser = await User.findByIdAndUpdate(userId, {
+            profilePic: uploadResponse.secure_url
+        }, {
+            new: true
+        }); //updating the profilePic entry for that user on the db
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.log("Error encountered while updating profile: ", error);
+        res.status(500)
+        .json({
+            message: "Internal Server Error."
+        });
+    }
 };

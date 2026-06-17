@@ -1,6 +1,7 @@
 //import dns from "node:dns/promises";
 
 import express from "express";
+import cookieParser from "cookie-parser";
 import path from "path";
 
 import { NODE_ENV, PORT } from "./lib/config.js";
@@ -15,6 +16,7 @@ const _dirname = path.resolve();
 const port = PORT || 3000;
 
 app.use(express.json()); // middlewhere that accepts json values from form submisions, stored inside req.body, take note anyways
+app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"; //take note
 import { JWT_SECRET, NODE_ENV } from "./config.js";
 
-export const generateToken = (userId, res) => {
+export const generateToken = (userId, res) => { //who provides the userId here?
     const token = jwt.sign({
         userId
     }, JWT_SECRET, {
