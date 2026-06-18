@@ -4,33 +4,31 @@ import { isSpoofedBot } from "@arcjet/inspect";
 export const arcjetProtection = async(req, res, next) => {
     try {
         const decision = await aj.protect(req);
+
         if (decision.isDenied()) {
             if (decision.reason.isRateLimit()) {
-                res.status(429)
-                .json({
+                return res.status(429).json({
                     message: "Too many requests."
                 });
-            } else if (decision.reason.isBot) {
-                res.status(403)
-                .json({
+            } else if (decision.reason.isBot()) {
+                return res.status(403).json({
                     message: "Bot access denied."
                 });
-            } else {
-                res.status(403)
-                .json({
-                    message: "Access denied by security policy." //why are we using the else clause here seems too vague? take note anyways
-                });
-            }
-
-            if (decision.results.some(isSpoofedBot)) {
-                res.status(403)
-                .json({
+            } else if (decision.results.some(isSpoofedBot)) {
+                return res.status(403).json({
                     error: "Spoofed bot detected",
                     message: "Malicious bot detected."
                 });
+            } else {
+                return res.status(403).json({
+                    message: "Access denied by security policy."
+                });
             }
         }
-		next();
+
+        // Only continue if request is allowed
+        next();
+
     } catch (error) {
         console.log("Arcjet protection error: ", error);
     }
