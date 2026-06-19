@@ -1,0 +1,4 @@
+function SignUpPage() {
+	return <div>Signup Page</div>;
+};
+export default SignUpPage;
