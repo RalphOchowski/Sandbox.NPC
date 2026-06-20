@@ -15,7 +15,7 @@ export const useAuthStore = create((set) => ({
 		}
 		catch (error) {
 			console.log("Error in authCheck:", error);
-			set({ authUser: null });
+			set({ authUser: null }); //take note
 		}
 		finally {
 			set({ isCheckingAuth: false });
@@ -40,7 +40,7 @@ export const useAuthStore = create((set) => ({
 	login: async (data) => {
 		set({ isLoggingIn: true })
 		try {
-			const res = await axiosInstance.post("/login", data); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
+			const res = await axiosInstance.post("/login", data); //take note
 			set({ authUser: res.data });
 			toast.success("Logged in successfully.");
 		}
