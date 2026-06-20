@@ -7,10 +7,11 @@ export const useAuthStore = create((set) => ({
 	isCheckingAuth: true,
 	isSigningUp: false,
 	isLoggingIn: false,
+	isUpdatingProfile:false,
 
 	checkAuth: async () => {
 		try {
-			const res = await axiosInstance.get("/auth-check");
+			const res = await axiosInstance.get("/auth/auth-check");
 			set({ authUser: res.data }); //take note
 		}
 		catch (error) {
@@ -25,7 +26,7 @@ export const useAuthStore = create((set) => ({
 	signup: async (data) => {
 		set({ isSigningUp: true })
 		try {
-			const res = await axiosInstance.post("/signup", data); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
+			const res = await axiosInstance.post("/auth/signup", data); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
 			set({ authUser: res.data });
 			toast.success("Account created successfully!");
 		}
@@ -40,7 +41,7 @@ export const useAuthStore = create((set) => ({
 	login: async (data) => {
 		set({ isLoggingIn: true })
 		try {
-			const res = await axiosInstance.post("/login", data); //take note
+			const res = await axiosInstance.post("/auth/login", data); //take note
 			set({ authUser: res.data });
 			toast.success("Logged in successfully.");
 		}
@@ -54,14 +55,31 @@ export const useAuthStore = create((set) => ({
 
 	logout: async () => {
 		try {
-			await axiosInstance.post("/logout"); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
+			await axiosInstance.post("/auth/logout"); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
 			set({ authUser: null }); /*take note, if authUser is null, the router redirects user back to login as specified in app.jsx */
 			toast.success("Logged out successfully.");
 		}
 		catch (error) {
 			toast.error(error.response.data.message);
 		}
-}}
+	},
+
+	updateProfile: async (data) => {
+		set({ isUpdatingProfile: true })
+		try {
+			const res = await axiosInstance.put("/auth/update-profile", data);
+			set({ authUser: res.data }); //take note
+			toast.success("Profile updated successfully.");
+		}
+		catch (error) {
+			console.log("Error while updating profile: ", error);
+			toast.error(error.response.data.message);
+		}
+		finally{
+			set({ isUpdatingProfile: false })
+		}
+	}
+}
 ));
 
 /* {name: "john", _id: 123, age: 25},

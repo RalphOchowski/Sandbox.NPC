@@ -10,7 +10,8 @@ export const useChatStore = create((set, get) => ({
     activeTab: "chats", //the tab that shows the current state the UI is in: either chat or contacts
     isUsersLoading: false, //whether the app is loading my users based on my selected selected tab (chats or contacts)
     isMessagesLoading: false, //whether the app is loading my messages to my contact that I'm currently chatting for my UI
-    isSoundEnabled: localStorage.getItem("isSoundEnabled") === true, //tf is local storage and how does it work, especially in this context
+    onlineUsers: [],
+    isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true, //tf is local storage and how does it work, especially in this context
 
     toggleSound: () => {
         localStorage.setItem("isSoundEnabled", !get().isSoundEnabled); //apparently local storage stores values (aka preferences for users) that can then be retrieved and applied if the user logs in again
@@ -36,7 +37,7 @@ export const useChatStore = create((set, get) => ({
         set({ isUsersLoading: true })
         try {
             const res = await axiosInstance.get("/messages/chats");
-            set({ allChats: res.data });
+            set({ chats: res.data });
         } catch (error) {
             toast.error(error.response.data.message);
         }
