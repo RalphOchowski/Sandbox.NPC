@@ -6,6 +6,7 @@ export const useAuthStore = create((set) => ({
 	authUser: null,
 	isCheckingAuth: true,
 	isSigningUp: false,
+	isLoggingIn: false,
 
 	checkAuth: async () => {
 		try {
@@ -34,8 +35,33 @@ export const useAuthStore = create((set) => ({
 		finally {
 			set({ isSigningUp: false })
 		}
-	}
-}
+	},
+
+	login: async (data) => {
+		set({ isLoggingIn: true })
+		try {
+			const res = await axiosInstance.post("/login", data); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
+			set({ authUser: res.data });
+			toast.success("Logged in successfully.");
+		}
+		catch (error) {
+			toast.error(error.response.data.message);
+		}
+		finally {
+			set({ isLoggingIn: false })
+		}
+	},
+
+	logout: async () => {
+		try {
+			await axiosInstance.post("/logout"); //take note, is this where the frontend actually makes the request to the backend using the endpoint I wrote?
+			set({ authUser: null }); /*take note, if authUser is null, the router redirects user back to login as specified in app.jsx */
+			toast.success("Logged out successfully.");
+		}
+		catch (error) {
+			toast.error(error.response.data.message);
+		}
+}}
 ));
 
 /* {name: "john", _id: 123, age: 25},
