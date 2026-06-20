@@ -6,7 +6,7 @@ import { CLIENT_URL } from "../lib/config.js";
 import cloudinary from "../lib/cloudinary.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
-export const signup = async(req, res) => {
+export const signup = async (req, res) => {
     const { fullName, email, password } = req.body; //take note
     if (!email || !password) {
         return res.status(400).json({
@@ -31,7 +31,7 @@ export const signup = async(req, res) => {
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //take note
         if (!emailRegex.test(
-                email)) { //take note
+            email)) { //take note
             return res.status(400).json({
                 message: "Invalid email format."
             });
@@ -44,9 +44,9 @@ export const signup = async(req, res) => {
         }); //take note
         if (user)
             return res.status(400)
-            .json({
-                message: "Email already exists."
-            });
+                .json({
+                    message: "Email already exists."
+                });
 
         const salt = await bcrypt.genSalt(10); //take note
         const hashedPassword = await bcrypt.hash(password, salt); //take note
@@ -73,21 +73,21 @@ export const signup = async(req, res) => {
             }
         } else {
             res.status(400)
-            .json({
-                message: "Invalid user data."
-            });
+                .json({
+                    message: "Invalid user data."
+                });
         }
     } catch (error) {
         console.log("Error in controller: ", error);
         res.status(500)
-        .json({
-            message: "Internal Server Error."
-        });
+            .json({
+                message: "Internal Server Error."
+            });
     }
 
 }
 
-export const login = async(req, res) => {
+export const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -115,13 +115,13 @@ export const login = async(req, res) => {
     } catch (error) {
         console.log("Error in controller: ", error);
         res.status(500)
-        .json({
-            message: "Internal Server Error."
-        });
+            .json({
+                message: "Internal Server Error."
+            });
     }
 };
 
-export const logout = async(_, res) => { //not using a request
+export const logout = async (_, res) => { //not using a request
     res.cookie("jwt", "", {
         maxAge: 0
     }); //erasing cookies by setting maximum age of jwt token generated for user to 0
@@ -130,7 +130,7 @@ export const logout = async(_, res) => { //not using a request
     });
 };
 
-export const updateProfile = async(req, res) => {
+export const updateProfile = async (req, res) => {
     try {
         const { profilePic } = req.body;
         if (!profilePic)
@@ -142,14 +142,14 @@ export const updateProfile = async(req, res) => {
         const updatedUser = await User.findByIdAndUpdate(userId, {
             profilePic: uploadResponse.secure_url
         }, {
-            new: true
+            returnDocument: "after"
         }); //updating the profilePic entry for that user on the db
         res.status(200).json(updatedUser);
     } catch (error) {
         console.log("Error encountered while updating profile: ", error);
         res.status(500)
-        .json({
-            message: "Internal Server Error."
-        });
+            .json({
+                message: "Internal Server Error."
+            });
     }
 };

@@ -16,7 +16,7 @@ const app = express();
 const _dirname = path.resolve();
 const port = PORT || 3000;
 
-app.use(express.json()); // middlewhere that accepts json values from form submisions, stored inside req.body, take note anyways
+app.use(express.json({ limit: "8mb" })); // middlewhere that accepts json values from form submisions, stored inside req.body, take note anyways
 app.use(cors( { origin: CLIENT_URL, credentials: true } )); //take note
 app.use(cookieParser()); // take note on what it does
 app.use("/api/auth", authRoutes);
