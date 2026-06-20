@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 function ContactList() {
   const { getAllContacts, allContacts, isUsersLoading, setSelectedUser } = useChatStore();
- //const { onlineUsers } = useAuthStore();
+ //const { onlineUsers } = useAuthStore(); will implement this after setting up Socket.io
 
   useEffect(() => {
     getAllContacts();
