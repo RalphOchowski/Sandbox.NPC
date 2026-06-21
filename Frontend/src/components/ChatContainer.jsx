@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import ChatHeader from './ChatHeader';
 import { useAuthStore } from '../store/useAuthStore';
@@ -9,10 +9,18 @@ import MessagesLoadingSkeleton from './MessagesLoadingSkeleton';
 function ChatContainer() {
     const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } = useChatStore();
     const { authUser } = useAuthStore();
+    const messageEndRef = useRef(null);
+
 
     useEffect(() => {
         getMessagesByUserId(selectedUser._id);
     }, [selectedUser, getMessagesByUserId]); //take note, from my understanding so far, the [] contains member variables and methods that get updated & recalled in order, respectively
+
+    useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
     //<> </> is called an empty fragment, take note
     return (
@@ -44,6 +52,7 @@ function ChatContainer() {
 
                             </div>
                         ))}
+                        <div ref={messageEndRef}/>
                     </div>
                 ) : isMessagesLoading ? <MessagesLoadingSkeleton /> : (
                     <NoChatHistoryPlaceholder name={selectedUser.fullName} />

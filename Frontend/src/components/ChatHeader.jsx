@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import { XIcon } from 'lucide-react';
 
+const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
+
 function ChatHeader() {
-  const { selectedUser, setSelectedUser } = useChatStore();
+  const { selectedUser, setSelectedUser, isSoundEnabled } = useChatStore();
 
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -29,7 +31,13 @@ function ChatHeader() {
           <p className="text-slate-400 text-sm">{/* isOnline ? "Online" : "Offline" */}Online</p>
         </div>
       </div>
-      <button onClick={() => setSelectedUser(null)}>
+      <button onClick={() => {
+        setSelectedUser(null)
+        if (isSoundEnabled) {
+          mouseClickSound.currentTime = 0;
+          mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+        }
+      }}>
         <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
       </button>
     </div>

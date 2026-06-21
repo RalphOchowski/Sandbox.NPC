@@ -35,7 +35,14 @@ function ProfileHeader() {
                     <div className="avatar online">
                         <button
                             className="size-14 rounded-full overflow-hidden relative group flex items-center justify-center"
-                            onClick={() => fileInputRef.current.click()}
+                            onClick={() => {
+                                fileInputRef.current.click()
+                                if (isSoundEnabled) {
+                                    mouseClickSound.currentTime = 0;
+                                    mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+                                }
+                            }
+                            }
                             disabled={isUpdatingProfile}
                         >
                             {isUpdatingProfile ? (
@@ -78,7 +85,13 @@ function ProfileHeader() {
                     {/* LOGOUT BTN */}
                     <button
                         className="text-slate-400 hover:text-slate-200 transition-colors"
-                        onClick={logout}
+                        onClick={() => {
+                            if (isSoundEnabled) {
+                                mouseClickSound.currentTime = 0;
+                                mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+                            }
+                            logout();
+                        }}
                     >
                         <LogOutIcon className="size-5" />
                     </button>
@@ -87,9 +100,10 @@ function ProfileHeader() {
                     <button
                         className="text-slate-400 hover:text-slate-200 transition-colors"
                         onClick={() => {
-                            // play click sound before toggling
-                            mouseClickSound.currentTime = 0; // reset to start
-                            mouseClickSound.play().catch((error) => console.log("Audio play failed:", error));
+                            if (isSoundEnabled) {
+                                mouseClickSound.currentTime = 0;
+                                mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+                            }
                             toggleSound();
                         }}
                     >
@@ -101,7 +115,7 @@ function ProfileHeader() {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

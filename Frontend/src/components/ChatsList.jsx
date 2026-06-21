@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
-import { useAuthStore } from "../store/useAuthStore";
+//import { useAuthStore } from "../store/useAuthStore";
+
+const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ChatList() {
-  const { getAllChatPartners, chats, isUsersLoading, setSelectedUser } = useChatStore();
+  const { getAllChatPartners, chats, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
  //const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
@@ -22,7 +24,13 @@ function ChatList() {
         <div
           key={chat._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
-          onClick={() => setSelectedUser(chat)}
+          onClick={() => {
+            if (isSoundEnabled) {
+            mouseClickSound.currentTime = 0;
+            mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+        }
+            setSelectedUser(chat)
+          }}
         >
           <div className="flex items-center gap-3">
             <div className={`avatar online`}>

@@ -1,26 +1,34 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
-import { useAuthStore } from "../store/useAuthStore";
+//import { useAuthStore } from "../store/useAuthStore";
+
+const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ContactList() {
-  const { getAllContacts, allContacts, isUsersLoading, setSelectedUser } = useChatStore();
- //const { onlineUsers } = useAuthStore(); will implement this after setting up Socket.io
+  const { getAllContacts, allContacts, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
+  //const { onlineUsers } = useAuthStore(); will implement this after setting up Socket.io
 
   useEffect(() => {
     getAllContacts();
   }, [getAllContacts]); //take note
 
-  if(isUsersLoading) return <UsersLoadingSkeleton />;
+  if (isUsersLoading) return <UsersLoadingSkeleton />;
 
 
   return (
-     <>
+    <>
       {allContacts.map((contact) => (
         <div
           key={contact._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
-          onClick={() => setSelectedUser(contact)}
+          onClick={() => {
+            setSelectedUser(contact)
+            if (isSoundEnabled) {
+              mouseClickSound.currentTime = 0;
+              mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+            }
+          }}
         >
           <div className="flex items-center gap-3">
             <div className={`avatar online`}>
