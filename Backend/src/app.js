@@ -9,10 +9,8 @@ import { NODE_ENV, PORT, CLIENT_URL } from "./lib/config.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
+import { app, server } from "./lib/socket.js";
 
-
-
-const app = express();
 const _dirname = path.resolve();
 const port = PORT || 3000;
 
@@ -30,7 +28,9 @@ if(NODE_ENV === "production") {
 	});
 }
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`I guess we're running at localhost:${port}...`);
 	connectDB();
 });
+
+//it seems like the express app is handling the routes while the socket handles realtime communication

@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
-//import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ContactList() {
   const { getAllContacts, allContacts, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
-  //const { onlineUsers } = useAuthStore(); will implement this after setting up Socket.io
+  const { onlineUsers } = useAuthStore(); 
 
   useEffect(() => {
     getAllContacts();
@@ -31,7 +31,7 @@ function ContactList() {
           }}
         >
           <div className="flex items-center gap-3">
-            <div className={`avatar online`}>
+            <div className={`avatar ${onlineUsers.includes(contact._id) ? "online" : "offline"}`}>
               <div className="size-12 rounded-full">
                 <img src={contact.profilePic || "/avatar.png"} alt={contact.fullName} />
               </div>

@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
-//import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ChatList() {
   const { getAllChatPartners, chats, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
- //const { onlineUsers } = useAuthStore();
+ const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getAllChatPartners();
@@ -33,7 +33,7 @@ function ChatList() {
           }}
         >
           <div className="flex items-center gap-3">
-            <div className={`avatar online`}>
+            <div className={`avatar ${onlineUsers.includes(chat._id) ? "online" : "offline"}`}>
               <div className="size-12 rounded-full">
                 <img src={chat.profilePic || "/avatar.png"} alt={chat.fullName} />
               </div>
