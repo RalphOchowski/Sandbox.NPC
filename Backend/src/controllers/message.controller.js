@@ -1,8 +1,9 @@
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js";
+import { io, getReceiverSocketId} from "../lib/socket.js";
 
-export const getAllContacts = async(req, res) => {
+export const getAllContacts = async (req, res) => {
     try {
         const loggedInUserId = req.user._id;
         const filteredUsers = await User.find({
@@ -19,19 +20,19 @@ export const getAllContacts = async(req, res) => {
     }
 };
 
-export const getMessagesByUserId = async(req, res) => {
+export const getMessagesByUserId = async (req, res) => {
     try {
         const myId = req.user._id;
         const { id: userToChatId } = req.params; //take note
 
         const message = await Message.find({
             $or: [{
-                    senderId: myId,
-                    receiverId: userToChatId
-                }, {
-                    senderId: userToChatId,
-                    receiverId: myId
-                }
+                senderId: myId,
+                receiverId: userToChatId
+            }, {
+                senderId: userToChatId,
+                receiverId: myId
+            }
             ]
         }); //take note, wtf just happened here? Apparently it finds messages you've sent (first case) and received (second case).
         res.status(200).json(message);
@@ -43,7 +44,7 @@ export const getMessagesByUserId = async(req, res) => {
     }
 };
 
-export const sendMessage = async(req, res) => {
+export const sendMessage = async (req, res) => {
     try {
         const { text, image } = req.body;
         const { id: receiverId } = req.params;
@@ -81,7 +82,13 @@ export const sendMessage = async(req, res) => {
             image: imageUrl
         });
         await newMessage.save();
-        //todo: send message in real-time if user is online using socket.io
+
+        //take note, this is where we emit the message to the receiver if they are online
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage); // take note, what does newMessage do? It is the event name that the receiver will listen for in order to receive the message. The newMessage object is the data being sent with the event, which contains the details of the message that was just sent.
+        }
+
         res.status(201).json(newMessage);
     } catch (error) {
         console.log("Error while sending message: ", error.message);
@@ -91,16 +98,16 @@ export const sendMessage = async(req, res) => {
     }
 };
 
-export const getChatPartners = async(req, res) => {
+export const getChatPartners = async (req, res) => {
     try {
         const loggedInUserId = req.user._id;
 
         const messages = await Message.find({
             $or: [{
-                    senderId: loggedInUserId,
-                }, {
-                    receiverId: loggedInUserId
-                }
+                senderId: loggedInUserId,
+            }, {
+                receiverId: loggedInUserId
+            }
             ]
         }); //take note, finds all messages where the logged in user was either the sender or the recipient
         const chatPartnerIds = [...new Set(messages.map(msg => msg.senderId.toString() === loggedInUserId.toString() ? msg.receiverId.toString() : msg.senderId.toString()))]; //take note, basically fetches the appropriate id of the other person if the message was either sent or received by the logged in user. Still unclear on the "..." (apparently that "stretches" it, no idea what that means) array, set (to prevent duplication somehow...?) and the map functionality

@@ -7,14 +7,18 @@ import MessageInput from './MessageInput';
 import MessagesLoadingSkeleton from './MessagesLoadingSkeleton';
 
 function ChatContainer() {
-    const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } = useChatStore();
+    const { selectedUser, getMessagesByUserId, messages, isMessagesLoading, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
     const { authUser } = useAuthStore();
     const messageEndRef = useRef(null);
 
 
     useEffect(() => {
         getMessagesByUserId(selectedUser._id);
-    }, [selectedUser, getMessagesByUserId]); //take note, from my understanding so far, the [] contains member variables and methods that get updated & recalled in order, respectively
+        subscribeToMessages()
+
+        //clean up
+        return () => unsubscribeFromMessages()
+    }, [selectedUser, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]); //take note, from my understanding so far, the [] contains member variables and methods that get updated & recalled in order, respectively
 
     useEffect(() => {
     if (messageEndRef.current) {

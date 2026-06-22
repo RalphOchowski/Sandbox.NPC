@@ -3,6 +3,8 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 
+const notificationSound = new Audio("./sounds/notification.mp3");
+
 export const useChatStore = create((set, get) => ({
     allContacts: [], //will contain all the contacts to be displayed in my UI
     chats: [], //will contain all the chats with my contacts to be displayed in my UI
@@ -76,17 +78,41 @@ export const useChatStore = create((set, get) => ({
             isOptimistic: true
         };
         //immediately update the ui by adding the optimistic message
-        set({messages: [...messages, optimisticMessage]});
+        set({ messages: [...messages, optimisticMessage] });
 
         try {
             const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
             set({ messages: messages.concat(res.data) });
         }
         catch (error) {
-            set({messages: messages}); //sets optimistic message back to last sent or received message
+            set({ messages: messages }); //sets optimistic message back to last sent or received message
             toast.error(error?.response?.data?.message || "Something went wrong.");
         } //take note of specifically this block
-    }
+    },
+
+    //take note, this is where we listen for new messages from the server and update the UI accordingly
+    subscribeToMessages: () => {
+        const { selectedUser, isSoundEnabled } = get();
+        if (!selectedUser) return;
+        const socket = useAuthStore.getState().socket; //take note, this is where we get the socket instance from the auth store
+        socket.on("newMessage", (newMessage) => {
+            const isMessageSelectedFromUser = newMessage.senderId === selectedUser._id;
+            if(!isMessageSelectedFromUser) return; //take note, what do these two statements do? Answer: It won't show you an optimisitc message from person one if you have person two's chat opened and vice versa
+            const currentMessages = get().messages; //take note, get the messages state value
+            set({ messages: [...currentMessages, newMessage] }); //take note, update the state of messages by adding the new message at the very last
+            if (isSoundEnabled) {
+                notificationSound.currentTime = 0;
+                notificationSound.play().catch((e) => console.log("Audio playback failed: ", e));
+            }
+
+        });
+    },
+
+    unsubscribeFromMessages: () => {
+        const socket = useAuthStore.getState().socket;
+        socket.off("newMessage"); //take note
+    },
+
 })); //take note
 
 
