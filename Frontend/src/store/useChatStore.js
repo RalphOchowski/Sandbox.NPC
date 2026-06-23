@@ -92,24 +92,31 @@ export const useChatStore = create((set, get) => ({
 
     //take note, this is where we listen for new messages from the server and update the UI accordingly
     subscribeToMessages: () => {
-        const { authUser } = useAuthStore.getState();
-        const { selectedUser, isSoundEnabled } = get();
-        if (!selectedUser) return;
-        const socket = useAuthStore.getState().socket; //take note, this is where we get the socket instance from the auth store
-        socket.on("newMessage", (newMessage) => {
-            //const isMessageSelectedFromUser = newMessage.senderId === selectedUser._id;
-            const isRelevantChat =
-                newMessage.senderId === selectedUser._id || newMessage.receiverId === selectedUser._id;
-            if (!isRelevantChat) return; //take note, what do these two statements do? Answer: It won't show you an optimisitc message from person one if you have person two's chat opened and vice versa
-            const currentMessages = get().messages; //take note, get the messages state value
-            set({ messages: [...currentMessages, newMessage] }); //take note, update the state of messages by adding the new message at the very last
-            if (isSoundEnabled && newMessage.senderId !== authUser._id) {
-                notificationSound.currentTime = 0;
-                notificationSound.play().catch((e) => console.log("Audio playback failed: ", e));
-            } //take note, if the sound is enabled and the new message is not sent by me, play the notification sound
+    const { authUser } = useAuthStore.getState();
+    const socket = useAuthStore.getState().socket; //take note, this is where we get the socket instance from the auth store
+    const { selectedUser } = get(); //take note, we only check selectedUser here
+    if (!selectedUser) return;
 
-        });
-    },
+    socket.on("newMessage", (newMessage) => {
+        //take note, always pull the latest state inside the handler
+        const { selectedUser, isSoundEnabled, messages } = get();
+
+        //const isMessageSelectedFromUser = newMessage.senderId === selectedUser._id;
+        const isRelevantChat =
+            selectedUser &&
+            (newMessage.senderId === selectedUser._id || newMessage.receiverId === selectedUser._id);
+
+        if (!isRelevantChat) return; //take note, what do these two statements do? Answer: It won't show you an optimisitc message from person one if you have person two's chat opened and vice versa
+
+        const currentMessages = messages; //take note, get the messages state value
+        set({ messages: [...currentMessages, newMessage] }); //take note, update the state of messages by adding the new message at the very last
+
+        if (isSoundEnabled && newMessage.senderId !== authUser._id) { 
+            notificationSound.currentTime = 0;
+            notificationSound.play().catch((e) => console.log("Audio playback failed: ", e));
+        } //take note, if the sound is enabled and the new message is not sent by me, play the notification sound
+    });
+},
 
     unsubscribeFromMessages: () => {
         const socket = useAuthStore.getState().socket;
