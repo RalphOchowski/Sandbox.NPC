@@ -103,7 +103,7 @@ export const useChatStore = create((set, get) => ({
             if (!isRelevantChat) return; //take note, what do these two statements do? Answer: It won't show you an optimisitc message from person one if you have person two's chat opened and vice versa
             const currentMessages = get().messages; //take note, get the messages state value
             set({ messages: [...currentMessages, newMessage] }); //take note, update the state of messages by adding the new message at the very last
-            if (isSoundEnabled && newMessage.senderId !== authUser._id) { 
+            if (isSoundEnabled && newMessage.senderId !== authUser._id) {
                 notificationSound.currentTime = 0;
                 notificationSound.play().catch((e) => console.log("Audio playback failed: ", e));
             } //take note, if the sound is enabled and the new message is not sent by me, play the notification sound

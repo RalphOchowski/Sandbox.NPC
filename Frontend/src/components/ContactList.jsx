@@ -7,7 +7,7 @@ const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ContactList() {
   const { getAllContacts, allContacts, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
-  const { onlineUsers } = useAuthStore(); 
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getAllContacts();

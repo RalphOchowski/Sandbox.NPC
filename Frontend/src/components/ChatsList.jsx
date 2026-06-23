@@ -8,27 +8,27 @@ const mouseClickSound = new Audio("./sounds/mouse-click.mp3");
 
 function ChatList() {
   const { getAllChatPartners, chats, isUsersLoading, setSelectedUser, isSoundEnabled } = useChatStore();
- const { onlineUsers } = useAuthStore();
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getAllChatPartners();
   }, [getAllChatPartners]); //take note
 
-  if(isUsersLoading) return <UsersLoadingSkeleton />;
-  if(chats.length === 0) return <NoChatsFound />
+  if (isUsersLoading) return <UsersLoadingSkeleton />;
+  if (chats.length === 0) return <NoChatsFound />
 
 
   return (
-     <>
+    <>
       {chats.map((chat) => (
         <div
           key={chat._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
           onClick={() => {
             if (isSoundEnabled) {
-            mouseClickSound.currentTime = 0;
-            mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
-        }
+              mouseClickSound.currentTime = 0;
+              mouseClickSound.play().catch(err => console.log("Audio play failed:", err));
+            }
             setSelectedUser(chat)
           }}
         >
