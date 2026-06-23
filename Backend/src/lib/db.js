@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { MONGO_URI } from "./config.js";
 
-export const connectDB = async() => {
+export const connectDB = async () => {
     try {
         const connectionValue = await mongoose.connect(MONGO_URI, {
             dbName: "realtime_chat_application"

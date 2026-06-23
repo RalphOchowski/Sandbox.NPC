@@ -5,12 +5,12 @@ const userSchema = new mongoose.Schema({ //take note
         type: String,
         required: true,
         unique: true,
-		trim: true
+        trim: true
     },
     fullName: {
         type: String,
         required: true,
-		trim: true
+        trim: true
     },
     password: {
         type: String,
@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema({ //take note
     },
     profilePic: {
         type: String,
-    default:
-        ""
+        default:
+            ""
     },
 }, {
     timestamps: true //take note

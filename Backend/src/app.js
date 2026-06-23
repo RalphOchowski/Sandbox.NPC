@@ -15,13 +15,13 @@ const _dirname = path.resolve();
 const port = PORT || 3000;
 
 app.use(express.json({ limit: "10mb" })); // middlewhere that accepts json values from form submisions, stored inside req.body, take note anyways
-app.use(cors( { origin: CLIENT_URL, credentials: true } )); //take note
+app.use(cors({ origin: CLIENT_URL, credentials: true })); //take note
 app.use(cookieParser()); // take note on what it does
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
 //deployment prep
-if(NODE_ENV === "production") {
+if (NODE_ENV === "production") {
 	app.use(express.static(path.join(_dirname, "../Frontend/dist/")));
 	app.get(/.*/, (req, res) => {
 		res.sendFile(path.join(_dirname, "../Frontend/dist/index.html"))
@@ -29,7 +29,7 @@ if(NODE_ENV === "production") {
 }
 
 server.listen(port, () => {
-    console.log(`I guess we're running at localhost:${port}...`);
+	console.log(`I guess we're running at localhost:${port}...`);
 	connectDB();
 });
 

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { JWT_SECRET } from "../lib/config.js";
 
-export const protectRoute = async(req, res, next) => { //take note, last parameter representing the adjacent function that is supposed to be called once the validation is successful
+export const protectRoute = async (req, res, next) => { //take note, last parameter representing the adjacent function that is supposed to be called once the validation is successful
     try {
         const token = req.cookies.jwt; //whether the user has a token
         if (!token)
@@ -27,6 +27,7 @@ export const protectRoute = async(req, res, next) => { //take note, last paramet
     } catch (error) {
         console.log("Error in protectRoute middleware: ", error);
         res.status(500).json({
-		message: "Internal server error."});
-        }
-        }
+            message: "Internal server error."
+        });
+    }
+}
